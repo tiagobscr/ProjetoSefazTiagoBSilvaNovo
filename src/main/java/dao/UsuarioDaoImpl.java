@@ -15,8 +15,8 @@ import entidade.Usuario;
  * @author Tiago Batista
  *
  *         Essa classe implementa a interface, todos os metodos mostrados na
- *         interface. Lembrando de uma coisa, a implementação ela recebe no
- *         construtor o entityManager, a conexão com o banco de dados, deixando
+ *         interface. Lembrando de uma coisa, a implementaï¿½ï¿½o ela recebe no
+ *         construtor o entityManager, a conexï¿½o com o banco de dados, deixando
  *         assim essa classe totalemnte independente
  *
  */
@@ -24,25 +24,32 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
 	private EntityManager ent;
 
-	// Construtor vai receber a conexão para executar
+	// Construtor vai receber a conexÃ£o para executar
 	public UsuarioDaoImpl(EntityManager ent) {
+
 		this.ent = ent;
+
 	}
 
 	@Override
 	public boolean inserir(Usuario usuario) {
 		// TODO Auto-generated method stub
-
 		EntityTransaction tx = ent.getTransaction();
-		tx.begin();
 
-		ent.persist(usuario);
-		tx.commit();
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		FacesMessage facesMessage = new FacesMessage("Salvo com sucesso");
-		facesContext.addMessage(null, facesMessage);
+		try {
 
-		return true;
+			tx.begin();
+			ent.persist(usuario);
+			tx.commit();
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			FacesMessage facesMessage = new FacesMessage("Salvo com sucesso");
+			facesContext.addMessage(null, facesMessage);
+
+			return true;
+		} catch (Exception e) {
+			tx.rollback();
+			return false;
+		}
 	}
 
 	@Override
@@ -51,11 +58,14 @@ public class UsuarioDaoImpl implements UsuarioDao {
 		System.out.println(usuario);
 		System.out.println(usuario.getEmail());
 		EntityTransaction tx = ent.getTransaction();
-		tx.begin();
+		try {
+			tx.begin();
 
-		ent.merge(usuario);
-		tx.commit();
-
+			ent.merge(usuario);
+			tx.commit();
+		} catch (Exception e) {
+			tx.rollback();
+		}
 	}
 
 	@Override
@@ -63,15 +73,20 @@ public class UsuarioDaoImpl implements UsuarioDao {
 		// TODO Auto-generated method stub
 		System.out.println(usuario);
 		EntityTransaction tx = ent.getTransaction();
-		tx.begin();
+		try {
+			tx.begin();
 
-		ent.remove(usuario);
-		tx.commit();
+			ent.remove(usuario);
+			tx.commit();
+		} catch (Exception e) {
+			tx.rollback();
+
+		}
 
 	}
 
 	/**
-	 * Pesquisar, pesquisar pela chave primaria que é o email
+	 * Pesquisar, pesquisar pela chave primaria que Ã© o email
 	 */
 
 	@Override
@@ -81,10 +96,11 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
 		return usuario;
 	}
-	
+
 	/**
-	 * O metodo listar todos, faz um select * from, porém com o JPA, vc faz a consulta pelo objeto direto
-	 * assim from Usuario, que isso é o objeto usuario e não a tabela
+	 * O metodo listar todos, faz um select * from, porÃ©m com o JPA, vc faz a
+	 * consulta pelo objeto direto assim from Usuario, que isso Ã© o objeto usuario e
+	 * nÃ£o a tabela
 	 */
 
 	@SuppressWarnings("unchecked")
@@ -96,7 +112,7 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
 		return usuarios;
 	}
-	
+
 	/**
 	 * O metodo listar nome, faz um select por nome usando Where e LIKE para procura
 	 * 
